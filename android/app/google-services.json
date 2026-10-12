@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "630407849680",
+    "project_id": "flutter-ota-demo-ecaa5",
+    "storage_bucket": "flutter-ota-demo-ecaa5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630407849680:android:73dccf3bc2f3fee5d3e0d5",
+        "android_client_info": {
+          "package_name": "com.example.flutter_ota"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgMMCdumjlv7-NJyQBspv5SkBhgv060m4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
