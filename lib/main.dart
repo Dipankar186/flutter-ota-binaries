@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'ota/bloc/ota_bloc.dart';
+import 'firebase_options.dart'; // 👈 2. Yeh auto-generated file import honi chahiye
 import 'ota/bloc/ota_event.dart';
 import 'ota/bloc/ota_state.dart';
 import 'ota/service/native_bridge.dart';
