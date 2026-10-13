@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue, // 🔵 Base Version 1 screen color
+      backgroundColor: Colors.red, // 🔵 Base Version 1 screen color
       body: BlocListener<OtaBloc, OtaState>(
         listener: (context, state) {
           if (state is OtaDownloadingState) {
