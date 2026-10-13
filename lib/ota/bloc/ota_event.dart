@@ -1,18 +1,15 @@
-import '../model/ota_binary_manifest.dart';
-
 abstract class OtaEvent {}
 
 class CheckForUpdatesEvent extends OtaEvent {}
 
 class StartDownloadEvent extends OtaEvent {
-  final OtaBinaryManifest manifest;
-  StartDownloadEvent(this.manifest);
+  final String url;
+  StartDownloadEvent(this.url);
 }
 
 class UpdateProgressEvent extends OtaEvent {
   final double progress;
-  final String abi;
-  UpdateProgressEvent(this.progress, {this.abi = ''});
+  UpdateProgressEvent(this.progress);
 }
 
 class OtaFailureEvent extends OtaEvent {

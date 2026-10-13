@@ -4,22 +4,14 @@ class OtaInitialState extends OtaState {}
 
 class OtaCheckingState extends OtaState {}
 
-class OtaNoUpdateAvailable extends OtaState {
-  final String? message;
-  OtaNoUpdateAvailable([this.message]);
-}
+class OtaNoUpdateAvailable extends OtaState {}
 
 class OtaDownloadingState extends OtaState {
   final double progress;
-  final String abi;
-  OtaDownloadingState(this.progress, {this.abi = ''});
+  OtaDownloadingState(this.progress);
 }
 
-class OtaUpdateStagedSuccess extends OtaState {
-  final String abi;
-  final int version;
-  OtaUpdateStagedSuccess({required this.abi, required this.version});
-}
+class OtaUpdateStagedSuccess extends OtaState {}
 
 class OtaRollbackErrorState extends OtaState {
   final String message;
