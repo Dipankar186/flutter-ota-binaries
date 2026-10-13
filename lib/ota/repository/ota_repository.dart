@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 
 class OtaRepository {
   // Current client version hardcoded (V1 base ke liye 1 hoga)
-  final int currentLocalVersion = 1;
+  final int currentLocalVersion = 2;
 
 // 📁 Path: lib/ota/repository/ota_repository.dart
 
