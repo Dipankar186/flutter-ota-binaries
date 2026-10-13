@@ -16,7 +16,7 @@ class OtaIntegrityException implements Exception {
 
 class OtaRepository {
   /// Base binary version shipped in the APK
-  final int currentLocalVersion = 2;
+  final int currentLocalVersion = 1;
 
   /// Returns the target directory matching Android `context.filesDir + "/ota"`
   Future<Directory> _getOtaDirectory() async {
