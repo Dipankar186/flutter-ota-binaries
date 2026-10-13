@@ -1,91 +1,48 @@
-// 📁 Path: lib/ota/repository/ota_repository.dart
-
 import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
 
-class OtaRepository {
-  // Current version mapping flag
-  final int currentLocalVersion = 2;
+/// Native bridge for OTA Engine operations (ABI Resolution & Hard Process Termination)
+class NativeBridge {
+  static const MethodChannel _channel = MethodChannel('com.example.flutter_ota/native');
 
-  Future<void> downloadNewBinary({
-    required String url,
-    required Function(double progress) onProgress,
-  }) async {
-    final client = http.Client();
+  /// Dynamic Multiclass Architecture Resolver:
+  /// Queries native Android Build.SUPPORTED_ABIS to get the exact primary ABI runtime
+  /// specification (e.g. 'arm64-v8a', 'armeabi-v7a', 'x86_64').
+  static Future<String> getDeviceAbi() async {
+    if (!Platform.isAndroid) {
+      return 'unsupported';
+    }
+
     try {
-      final appDir = await getApplicationDocumentsDirectory();
-      final otaDirectory = Directory('${appDir.parent.path}/files/ota');
-
-      if (!await otaDirectory.exists()) {
-        await otaDirectory.create(recursive: true);
+      final String? abi = await _channel.invokeMethod<String>('getDeviceAbi');
+      if (abi != null && abi.isNotEmpty) {
+        return abi.trim();
       }
+    } on PlatformException catch (e) {
+      // ignore: avoid_print
+      print('⚠️ NativeBridge: Failed to get ABI from native channel: ${e.message}');
+    }
 
-      final tempPath = '${otaDirectory.path}/libapp_temp.so';
-      final finalPath = '${otaDirectory.path}/libapp.so';
+    // Default conservative fallback
+    return 'arm64-v8a';
+  }
 
-      // Setup clean request parameters
-      final request = http.Request('GET', Uri.parse(url));
-      request.followRedirects = true;
-      request.maxRedirects = 5;
+  /// Complete Native Memory Hard-Kill Process:
+  /// Triggers a native Activity crash-restart and immediate process kill
+  /// using `android.os.Process.killProcess(android.os.Process.myPid())` to purge
+  /// all dynamic VM memory segments and boot fresh with new AOT symbols.
+  static Future<void> restartAndHardKillProcess() async {
+    if (!Platform.isAndroid) {
+      return;
+    }
 
-      final http.StreamedResponse response = await client.send(request);
-
-      // Handle intermediate jumps if fallback happens
-      String finalDownloadUrl = url;
-      if (response.statusCode == 301 || response.statusCode == 302) {
-        finalDownloadUrl = response.headers['location'] ?? url;
-      }
-
-      final finalResponse = await client.send(http.Request('GET', Uri.parse(finalDownloadUrl)));
-
-      if (finalResponse.statusCode != 200) {
-        throw Exception("Server connection error: ${finalResponse.statusCode}");
-      }
-
-      // 🛠️ FIX: Content length check fallback mechanism
-      final totalBytes = finalResponse.contentLength ?? 0;
-      int receivedBytes = 0;
-
-      final File tempFile = File(tempPath);
-      final IOSink sink = tempFile.openWrite();
-
-      // Download chunks one by one synchronously
-      await finalResponse.stream.listen(
-            (List<int> chunk) {
-          receivedBytes += chunk.length;
-          sink.add(chunk);
-
-          // Progress calculation matrix with zero check fallback
-          if (totalBytes > 0) {
-            double progress = (receivedBytes / totalBytes) * 100;
-            onProgress(progress);
-          } else {
-            // Agar size null hai toh direct increment logic pass karo UI ko
-            onProgress(-1.0);
-          }
-        },
-        cancelOnError: true,
-      ).asFuture();
-
-      await sink.close();
-
-      // Verification validation layer (Size restriction threshold relaxed to 500KB)
-      final downloadedBytes = await tempFile.length();
-      if (await tempFile.exists() && downloadedBytes > 500 * 1024) {
-        final finalFile = File(finalPath);
-        if (await finalFile.exists()) {
-          await finalFile.delete();
-        }
-        await tempFile.rename(finalPath);
-        print("🎉 Success: File verification matching complete.");
-      } else {
-        throw Exception("Verification failed: File size too small ($downloadedBytes bytes)");
-      }
-    } catch (e) {
-      throw Exception("Stream connection breakdown: $e");
-    } finally {
-      client.close();
+    try {
+      await _channel.invokeMethod('restartAndHardKill');
+    } on PlatformException catch (e) {
+      // ignore: avoid_print
+      print('⚠️ NativeBridge: Hard-kill invocation failed: ${e.message}');
+      // Fallback exit if native bridge fails
+      exit(0);
     }
   }
 }
